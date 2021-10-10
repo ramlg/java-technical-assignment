@@ -1,3 +1,3 @@
 # Notes
 
-Please add here any notes, assumptions and design decisions that might help up understand your though process.
+Mockito libraries(mockito-junit-jupiter, mockito-core) added to mock the dependencies during unit tests.

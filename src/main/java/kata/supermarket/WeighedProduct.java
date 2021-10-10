@@ -5,8 +5,10 @@ import java.math.BigDecimal;
 public class WeighedProduct {
 
     private final BigDecimal pricePerKilo;
+    private final String identifier;
 
-    public WeighedProduct(final BigDecimal pricePerKilo) {
+    public WeighedProduct(String identifier, final BigDecimal pricePerKilo) {
+        this.identifier = identifier;
         this.pricePerKilo = pricePerKilo;
     }
 
@@ -15,6 +17,6 @@ public class WeighedProduct {
     }
 
     public Item weighing(final BigDecimal kilos) {
-        return new ItemByWeight(this, kilos);
+        return new ItemByWeight(identifier, this, kilos);
     }
 }
