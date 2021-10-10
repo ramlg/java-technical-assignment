@@ -1,9 +1,13 @@
 package kata.supermarket;
 
+import kata.supermarket.discounts.DiscountCalculator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -11,13 +15,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class TotalCalculatorTest {
 
-    private TotalCalculator totalCalculator = new TotalCalculator();
+    @Mock
+    private DiscountCalculator discountCalculator;
+
+    private TotalCalculator totalCalculator;
+
+    @BeforeEach
+    public void beforeEachTest() {
+        openMocks(this);
+        totalCalculator = new TotalCalculator(discountCalculator);
+        when(discountCalculator.calculateDiscounts(anyList())).thenReturn(ZERO);
+    }
 
     @DisplayName("totalCalculator provides its total value when containing...")
     @MethodSource
@@ -37,6 +55,20 @@ public class TotalCalculatorTest {
                 aSingleItemPricedByWeight(),
                 multipleItemsPricedByWeight()
         );
+    }
+
+    @DisplayName("Discount applied from discount calculator")
+    @Test
+    public void discountFromDiscountCalculatorIsAppliedOnTotalAmount() {
+
+        List<Item> items = itemsWithDiscounts();
+        when(discountCalculator.calculateDiscounts(items)).thenReturn(new BigDecimal("0.20"));
+        assertEquals(new BigDecimal("2.82"), totalCalculator.calculate(items));
+
+    }
+
+    private List<Item> itemsWithDiscounts() {
+        return Arrays.asList(aPintOfMilk(), aPintOfMilk(), aPintOfMilk(), aPackOfDigestives());
     }
 
     private static Arguments aSingleItemPricedByWeight() {
